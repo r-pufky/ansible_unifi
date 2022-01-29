@@ -1,0 +1,88 @@
+---
+###############################################################################
+# Manager Unifi Users
+###############################################################################
+# Check if users exist and create if enabled.
+#
+# Args:
+#   unifi_user: string unifi username.
+#   unifi_group: string unifi group.
+#   mongo_user: string unifi username.
+#   mongo_group: string unifi group.
+#   unifi_create_user: boolean true to create role default user.
+#   unifi_default_unifi_user: dict containing builitin.user options for unifi.
+#   unifi_default_unifi_group: dict containing builitin.group options for unifi.
+#   unifi_default_mongo_user: dict containing builitin.user options for unifi.
+#   unifi_default_mongo_group: dict containing builitin.group options for unifi.
+
+- name: 'manage users | confirm unifi user exists'
+  ansible.builtin.command: 'id {{ unifi_user }}'
+  register: _unifi_user_exists
+  changed_when: _unifi_user_unifi_exists.rc > 0
+  failed_when: false
+
+- name: 'manage users | confirm unifi group exists'
+  ansible.builtin.command: 'groups {{ unifi_group }}'
+  register: _unifi_group_exists
+  changed_when: _unifi_group_unifi_exists.rc > 0
+  failed_when: false
+
+- name: 'manage users | create unifi group'
+  ansible.builtin.group:
+    name:  '{{ unifi_default_unifi_group.name }}'
+    gid:   '{{ unifi_default_unifi_group.gid }}'
+    state: 'present'
+  when: unifi_create_user and _unifi_group_unifi_exists.rc != 0
+
+- name: 'manage users | create unifi user (logins disabled)'
+  ansible.builtin.user:
+    name:            '{{ unifi_default_unifi_user.name }}'
+    group:           '{{ unifi_default_unifi_user.group }}'
+    groups:          '{{ unifi_default_unifi_user.groups }}'
+    uid:             '{{ unifi_default_unifi_user.uid }}'
+    shell:           '{{ unifi_default_unifi_user.shell }}'
+    home:            '{{ unifi_data|default(unifi_default_unifi_user.home) }}'
+    create_home:     '{{ unifi_default_unifi_user.create_home }}'
+    password:        '{{ unifi_default_unifi_user.password }}'
+    password_lock:   '{{ unifi_default_unifi_user.password_lock }}'
+    update_password: '{{ unifi_default_unifi_user.update_password }}'
+    expires:         '{{ unifi_default_unifi_user.expires }}'
+    system:          '{{ unifi_default_unifi_user.system }}'
+    state:           'present'
+  when: unifi_create_user and _unifi_user_unifi_exists.rc != 0
+
+- name: 'manage users | confirm mongo user exists'
+  ansible.builtin.command: 'id {{ mongo_user }}'
+  register: _unifi_user_exists
+  changed_when: _unifi_user_mongo_exists.rc > 0
+  failed_when: false
+
+- name: 'manage users | confirm mongo group exists'
+  ansible.builtin.command: 'groups {{ mongo_group }}'
+  register: _unifi_group_exists
+  changed_when: _unifi_group_mongo_exists.rc > 0
+  failed_when: false
+
+- name: 'manage users | create mongo group'
+  ansible.builtin.group:
+    name:  '{{ unifi_default_mongo_group.name }}'
+    gid:   '{{ unifi_default_mongo_group.gid }}'
+    state: 'present'
+  when: unifi_create_user and _unifi_group_mongo_exists.rc != 0
+
+- name: 'manage users | create mongo user (logins disabled)'
+  ansible.builtin.user:
+    name:            '{{ unifi_default_mongo_user.name }}'
+    group:           '{{ unifi_default_mongo_user.group }}'
+    groups:          '{{ unifi_default_mongo_user.groups }}'
+    uid:             '{{ unifi_default_mongo_user.uid }}'
+    shell:           '{{ unifi_default_mongo_user.shell }}'
+    home:            '{{ unifi_default_mongo_user.home }}'
+    create_home:     '{{ unifi_default_mongo_user.create_home }}'
+    password:        '{{ unifi_default_mongo_user.password }}'
+    password_lock:   '{{ unifi_default_mongo_user.password_lock }}'
+    update_password: '{{ unifi_default_mongo_user.update_password }}'
+    expires:         '{{ unifi_default_mongo_user.expires }}'
+    system:          '{{ unifi_default_mongo_user.system }}'
+    state:           'present'
+  when: unifi_create_user and _unifi_user_mongo_exists.rc != 0

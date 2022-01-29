@@ -1,0 +1,53 @@
+---
+###############################################################################
+# Unifi Controller Backup
+###############################################################################
+# Backup entire Unifi database and configuration. This is typically multi-GB.
+#
+# Smaller configuration only backups can be generated via the WebUI.
+#
+# Reference:
+# * https://help.ui.com/hc/en-us/articles/204952144-UniFi-How-to-Create-and-Restore-a-Backup
+
+- name: 'backup | shutdown unifi controller for backup'
+  ansible.builtin.service:
+    name:  'unifi'
+    state: 'stopped'
+
+- name: 'backup | setup staging'
+  ansible.builtin.file:
+    path:  '{{ unifi_staging }}'
+    mode:  0700
+    state: 'directory'
+
+- name: 'backup | create backup'
+  community.general.archive:
+    path: '{{ unifi_data }}'
+    mode: 0700
+    dest: '{{ unifi_staging }}/unifi-config.tar.gz'
+
+- name: 'backup | retrieve backup'
+  ansible.builtin.fetch:
+    src:  '{{ unifi_staging }}/unifi-config.tar.gz'
+    dest: '{{ unifi_local_backup }}'
+    flat: true
+
+- name: 'backup | DO NOT ADD TO REPO'
+  ansible.builtin.debug:
+    msg: |
+
+      Use created backup to fully restore a new unifi instance.
+
+      Do not commit to repo (backup is multi-GB).
+
+      Export config without historical data via WebUI if checking into repo.
+
+- name: 'backup | start unifi'
+  ansible.builtin.service:
+    name:  'unifi'
+    state: 'started'
+
+- name: 'backup | cleanup'
+  ansible.builtin.file:
+    path:  '{{ unifi_staging }}'
+    state: 'absent'

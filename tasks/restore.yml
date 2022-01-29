@@ -1,0 +1,61 @@
+---
+###############################################################################
+# Unifi Controller Restore
+###############################################################################
+# Restore entire Unifi database and configuration. This is typically multi-GB.
+#
+# Repair DB before starting ensuring known good state.
+#
+# Reference:
+# * https://help.ui.com/hc/en-us/articles/204952144-UniFi-How-to-Create-and-Restore-a-Backup
+
+- name: 'restore | shutdown controller for restore'
+  ansible.builtin.service:
+    name:  'unifi'
+    state: 'stopped'
+
+- name: 'restore | setup staging'
+  ansible.builtin.file:
+    path:  '{{ unifi_staging }}'
+    mode:  0700
+    state: 'directory'
+
+- name: 'restore | stage backup'
+  ansible.builtin.command: "mv '{{ unifi_data }}' '{{ unifi_staging }}/data'"
+  args:
+    creates: '{{ unifi_staging }}/data'
+    removes: '{{ unifi_data }}'
+
+- name: 'restore | prep restore'
+  ansible.builtin.file:
+    path:  '{{ unifi_data }}'
+    owner: '{{ unifi_user }}'
+    group: '{{ unifi_group }}'
+    mode:  0750
+    state: 'directory'
+
+# tar preserves file permissions
+- name: 'restore | restore backup'
+  ansible.builtin.unarchive:
+    src:        '{{ unifi_local_backup }}'
+    dest:       '{{ unifi_data }}'
+    extra_opts: '--strip-components=1'
+
+- name: 'restore | validate backup' # noqa no-changed-when always execute
+  ansible.builtin.command: 'mongod --dbpath {{ unifi_data }}/db --repair'
+
+- name: 'restore | set ownership'
+  ansible.builtin.command: 'chown -R {{ unifi_user }}:{{ unifi_group }} {{ unifi_data }}'
+  args:
+    warn: false
+  changed_when: false
+
+- name: 'restore | start unifi'
+  ansible.builtin.service:
+    name:  'unifi'
+    state: 'started'
+
+- name: 'restore | cleanup'
+  ansible.builtin.file:
+    path:  '{{ unifi_staging }}'
+    state: 'absent'

@@ -1,0 +1,83 @@
+---
+###############################################################################
+# Default Unifi Package Dependencies
+###############################################################################
+# Default required packages for Unifi install.
+
+unifi_default_dependencies:
+  - 'gnupg2'
+
+unifi_default_packages:
+  - 'mongodb-org'
+  - 'openjdk-8-jre-headless'
+  - 'unifi'
+
+###############################################################################
+# Default Unifi User Group
+###############################################################################
+# Default group settings if an Unifi user is force created.
+
+unifi_default_unifi_group:
+  name: 'unifi'
+  gid:  400
+
+###############################################################################
+# Default Unifi User Account
+###############################################################################
+# Default user settings if an Unifi user is force created.
+#
+# Logins are disabled.
+
+unifi_default_unifi_user:
+  name:            'unifi'
+  group:           'unifi'
+  groups:
+    - 'unifi'
+  uid:             400
+  shell:           '/usr/sbin/nologin'
+  home:            '/var/lib/unifi'
+  create_home:     false
+  password:        '!'
+  password_lock:   true
+  update_password: 'always'
+  expires:         -1
+  system:          true
+
+###############################################################################
+# Default MongoDB User Group
+###############################################################################
+# Default group settings if an MongoDB user is force created.
+
+unifi_default_mongo_group:
+  name: 'mongodb'
+  gid:  401
+
+###############################################################################
+# Default MongoDB User Account
+###############################################################################
+# Default user settings if an MongoDB user is force created.
+#
+# Logins are disabled.
+
+unifi_default_mongo_user:
+  name:            'mongodb'
+  group:           'nogroup'
+  groups:
+    - 'nogroup'
+    - 'mongodb'
+  uid:             401
+  shell:           '/usr/sbin/nologin'
+  home:            '/home/mongodb'
+  create_home:     false
+  password:        '!'
+  password_lock:   true
+  update_password: 'always'
+  expires:         -1
+  system:          true
+
+###############################################################################
+# Default Unifi Version
+###############################################################################
+# updated: 2021-12-14
+
+unifi_default_version: '6.5.55'
