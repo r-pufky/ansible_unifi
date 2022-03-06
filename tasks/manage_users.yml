@@ -17,13 +17,13 @@
 
 - name: 'manage users | confirm unifi user exists'
   ansible.builtin.command: 'id {{ unifi_user }}'
-  register: _unifi_user_exists
+  register: _unifi_user_unifi_exists
   changed_when: _unifi_user_unifi_exists.rc > 0
   failed_when: false
 
 - name: 'manage users | confirm unifi group exists'
   ansible.builtin.command: 'groups {{ unifi_group }}'
-  register: _unifi_group_exists
+  register: _unifi_group_unifi_exists
   changed_when: _unifi_group_unifi_exists.rc > 0
   failed_when: false
 
@@ -53,13 +53,13 @@
 
 - name: 'manage users | confirm mongo user exists'
   ansible.builtin.command: 'id {{ mongo_user }}'
-  register: _unifi_user_exists
+  register: _unifi_user_mongo_exists
   changed_when: _unifi_user_mongo_exists.rc > 0
   failed_when: false
 
 - name: 'manage users | confirm mongo group exists'
   ansible.builtin.command: 'groups {{ mongo_group }}'
-  register: _unifi_group_exists
+  register: _unifi_group_mongo_exists
   changed_when: _unifi_group_mongo_exists.rc > 0
   failed_when: false
 
