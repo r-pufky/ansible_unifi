@@ -1,0 +1,462 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Annotate User Configuration.
+###############################################################################
+# Sanitize (standardize with default values if not set) UniFi configuration.
+#
+# Configuration option order does not matter. Default values are removed.
+#
+# Use r_pufky.data.v3 data annotations to enforce consistency and validation
+# checks.
+#
+# Generates:
+#   _unifi_map: list of dict - Annotated config map.
+#   _unifi_order: list of str - Config section order.
+#
+# Reference:
+# * https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec
+# * https://github.com/ansible/ansible/issues/77159
+# yamllint enable rule:line-length
+
+- name: 'Annotate | sanitize & annotate service defaults'
+  ansible.builtin.set_fact:  # noqa jinja[spacing] readability.
+    _unifi_srv_legacy_enable: "{{ {} | r_pufky.data.v3(
+        raw=unifi_srv_legacy_enable,
+        default=true,
+        _dir='/var/lib/unifi',
+        _properties='/var/lib/unifi/system.properties',
+        hint='bool',
+        order=1
+        )
+      }}"
+    _unifi_srv_os_enable: "{{ {} | r_pufky.data.v3(
+        raw=unifi_srv_os_enable,
+        default=false,
+        _dir='/var/lib/uosserver',
+        _purge='/usr/local/bin/uosserver-purge',
+        _config='/var/lib/uosserver/server.conf',
+        hint='bool',
+        order=2
+        )
+      }}"
+
+- name: 'Annotate | sanitize & annotate network server defaults'
+  ansible.builtin.set_fact:  # noqa jinja[spacing] readability.
+    _unifi_cfg_legacy_properties_unifi_http_port: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.http.port',
+        raw=unifi_cfg_legacy_properties_unifi_http_port,
+        default=8080,
+        hint='int',
+        keep=false,
+        order=1
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_port: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.port',
+        raw=unifi_cfg_legacy_properties_unifi_https_port,
+        default=8443,
+        hint='int',
+        keep=false,
+        order=2
+        )
+      }}"
+    _unifi_cfg_legacy_properties_portal_http_port: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='portal.http.port',
+        raw=unifi_cfg_legacy_properties_portal_http_port,
+        default=8880,
+        hint='int',
+        keep=false,
+        order=3
+        )
+      }}"
+    _unifi_cfg_legacy_properties_portal_https_port: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='portal.https.port',
+        raw=unifi_cfg_legacy_properties_portal_https_port,
+        default=8843,
+        hint='int',
+        keep=false,
+        order=4
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_stun_port: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.stun.port',
+        raw=unifi_cfg_legacy_properties_unifi_stun_port,
+        default=3478,
+        hint='int',
+        keep=false,
+        order=5
+        )
+      }}"
+    _unifi_cfg_legacy_properties_system_ip: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='system_ip',
+        raw=unifi_cfg_legacy_properties_system_ip,
+        default='',
+        hint='str',
+        keep=false,
+        order=6
+        )
+      }}"
+    _unifi_cfg_legacy_properties_portal_redirector_port: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='portal.redirector.port',
+        raw=unifi_cfg_legacy_properties_portal_redirector_port,
+        default=8881,
+        hint='int',
+        keep=false,
+        order=7
+        )
+      }}"
+    _unifi_cfg_legacy_properties_portal_redirector_port_wired: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='portal.redirector.port.wired',
+        raw=unifi_cfg_legacy_properties_portal_redirector_port_wired,
+        default=8882,
+        hint='int',
+        keep=false,
+        order=8
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_throughput_port: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.throughput.port',
+        raw=unifi_cfg_legacy_properties_unifi_throughput_port,
+        default=6789,
+        hint='int',
+        keep=false,
+        order=9
+        )
+      }}"
+    _unifi_cfg_legacy_properties_reporter_uuid: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='reporter-uuid',
+        raw=unifi_cfg_legacy_properties_reporter_uuid,
+        default='',
+        _auto='',
+        hint='str',
+        comment='Store auto-generated value in _auto',
+        order=10
+        )
+      }}"
+    _unifi_cfg_legacy_properties_uuid: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='uuid',
+        raw=unifi_cfg_legacy_properties_uuid,
+        default='',
+        _auto='',
+        hint='str',
+        comment='Store auto-generated value in _auto',
+        order=11
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_db_port: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.db.port',
+        raw=unifi_cfg_legacy_properties_unifi_db_port,
+        default=27117,
+        hint='int',
+        keep=false,
+        order=12
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_db_nojournal: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.db.nojournal',
+        raw=unifi_cfg_legacy_properties_unifi_db_nojournal,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=13
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_db_extraargs: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.db.extraargs',
+        raw=unifi_cfg_legacy_properties_unifi_db_extraargs,
+        default='',
+        hint='str',
+        keep=false,
+        order=14
+        )
+      }}"
+    _unifi_cfg_legacy_properties_is_default: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='is_default',
+        raw=unifi_cfg_legacy_properties_is_default,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=15
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_ciphers: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.ciphers',
+        raw=unifi_cfg_legacy_properties_unifi_https_ciphers,
+        data=unifi_cfg_legacy_properties_unifi_https_ciphers | join(','),
+        default=['TLS_RSA_WITH_AES_256_CBC_SHA',
+                'TLS_RSA_WITH_AES_128_CBC_SHA'],
+        hint='list of str',
+        keep=false,
+        order=16
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_ssl_enabled_protocols: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.sslEnabledProtocols',
+        raw=unifi_cfg_legacy_properties_unifi_https_ssl_enabled_protocols,
+        data=(
+          unifi_cfg_legacy_properties_unifi_https_ssl_enabled_protocols |
+          join(',')
+        ),
+        default=['TLSv1', 'SSLv2Hello'],
+        hint='list of str',
+        keep=false,
+        order=17
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_hsts: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.hsts',
+        raw=unifi_cfg_legacy_properties_unifi_https_hsts,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=18
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_hsts_max: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.hsts.max',
+        raw=unifi_cfg_legacy_properties_unifi_https_hsts_max,
+        default=31536000,
+        hint='int',
+        keep=false,
+        order=19
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_hsts_preload: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.hsts.preload',
+        raw=unifi_cfg_legacy_properties_unifi_https_hsts_preload,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=20
+        )
+      }}"
+    _unifi_cfg_legacy_properties_unifi_https_hsts_subdomain: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='unifi.https.hsts.subdomain',
+        raw=unifi_cfg_legacy_properties_unifi_https_hsts_subdomain,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=21
+        )
+      }}"
+    _unifi_cfg_legacy_properties_smtp_check_server_identity: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='smtp.checkserveridentity',
+        raw=unifi_cfg_legacy_properties_smtp_check_server_identity,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=22
+        )
+      }}"
+    _unifi_cfg_legacy_properties_smtp_starttls_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='smtp.starttls_enabled',
+        raw=unifi_cfg_legacy_properties_smtp_starttls_enabled,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=23
+        )
+      }}"
+    _unifi_cfg_legacy_properties_smtp_starttls_required: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='smtp.starttls_required',
+        raw=unifi_cfg_legacy_properties_smtp_starttls_required,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=24
+        )
+      }}"
+    _unifi_cfg_legacy_properties_debug_device: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='debug.device',
+        raw=unifi_cfg_legacy_properties_debug_device | lower,
+        default='warn',
+        hint='str',
+        order=25
+        )
+      }}"
+
+    _unifi_cfg_legacy_properties_debug_mgmt: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='debug.mgmt',
+        raw=unifi_cfg_legacy_properties_debug_mgmt | lower,
+        default='warn',
+        hint='str',
+        order=26
+        )
+      }}"
+    _unifi_cfg_legacy_properties_debug_sdn: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='debug.sdn',
+        raw=unifi_cfg_legacy_properties_debug_sdn | lower,
+        default='warn',
+        hint='str',
+        order=27
+        )
+      }}"
+    _unifi_cfg_legacy_properties_debug_setting_preference: "{{
+      {} | r_pufky.data.v3(
+        section='system.properties',
+        key='debug.setting_preference',
+        raw=unifi_cfg_legacy_properties_debug_setting_preference | lower,
+        default='auto',
+        hint='str',
+        order=28
+        )
+      }}"
+    _unifi_cfg_legacy_properties_debug_system: "{{ {} | r_pufky.data.v3(
+        section='system.properties',
+        key='debug.system',
+        raw=unifi_cfg_legacy_properties_debug_system | lower,
+        default='warn',
+        hint='str',
+        order=29
+        )
+      }}"
+    _unifi_cfg_legacy_mongodb_enable: "{{ {} | r_pufky.data.v3(
+        section='legacy',
+        raw=unifi_cfg_legacy_mongodb_enable,
+        default=true,
+        hint='bool',
+        order=1
+        )
+      }}"
+    _unifi_cfg_legacy_backup_prompt_disable: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_legacy_backup_prompt_disable,
+        default=true,
+        _value=unifi_cfg_legacy_backup_prompt_disable | lower,
+        _question='unifi/has_backup',
+        hint='bool',
+        order=2
+        )
+      }}"
+    _unifi_cfg_legacy_force_config_only_enable: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_legacy_force_config_only_enable,
+        default=false,
+        hint='bool',
+        order=3
+        )
+      }}"
+    _unifi_cfg_legacy_user: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_legacy_user,
+        default='unifi',
+        _uid='',
+        hint='str',
+        order=4
+        )
+      }}"
+    _unifi_cfg_legacy_group: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_legacy_group,
+        default='unifi',
+        _gid='',
+        hint='str',
+        order=5
+        )
+      }}"
+    _unifi_cfg_legacy_create_user: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_legacy_create_user,
+        default=true,
+        hint='bool',
+        order=6
+        )
+      }}"
+
+- name: 'Annotate | sanitize & annotate os defaults'
+  ansible.builtin.set_fact:  # noqa jinja[spacing] readability.
+    _unifi_cfg_os_version: "{{ {} | r_pufky.data.v3(
+        raw=unifi_role_os_version,
+        default='4.3.6',
+        _url=unifi_role_os_url ~ unifi_role_os_binary,
+        _version=unifi_role_os_version,
+        _binary=unifi_role_os_binary,
+        _installer='/tmp/' ~ unifi_role_os_version,
+        hint='str',
+        order=1
+        )
+      }}"
+    _unifi_cfg_os_purge_enable: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_os_purge_enable,
+        default=false,
+        hint='bool',
+        order=2
+        )
+      }}"
+    _unifi_cfg_os_installer_purge_enable: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_os_installer_purge_enable,
+        default=true,
+        hint='bool',
+        order=3
+        )
+      }}"
+    _unifi_cfg_os_download_retries: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_os_download_retries,
+        default=3,
+        hint='int',
+        order=4
+        )
+      }}"
+    _unifi_cfg_os_uosserver_users: "{{ {} | r_pufky.data.v3(
+        raw=unifi_cfg_os_uosserver_users,
+        data=[],
+        default=[],
+        hint='list of str',
+        order=5
+        )
+      }}"
+
+- name: 'Annotate | normalize unifi_cfg_os_uosserver_users'
+  ansible.builtin.set_fact:  # noqa jinja[spacing] readability.
+    _unifi_cfg_os_uosserver_users: '{{
+        _unifi_cfg_os_uosserver_users | combine({
+          "data":
+            _unifi_cfg_os_uosserver_users.data +
+            [{"user": item.user, "state": item.state | default("present")}]
+        })
+      }}'
+  loop: '{{ _unifi_cfg_os_uosserver_users.raw }}'
+  loop_control:
+    label: '{{ item.user }}'
+
+- name: 'Annotate | generate config map'
+  ansible.builtin.set_fact:
+    _unifi_map: '{{
+        hostvars[inventory_hostname] | dict2items |
+        selectattr("key", "match", "_unifi_cfg_legacy_properties_*")
+      }}'
+    _unifi_order:
+      - 'system.properties'

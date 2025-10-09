@@ -1,0 +1,38 @@
+---
+###############################################################################
+# UniFi OS
+###############################################################################
+# Modern containerized UniFi deployment.
+
+# Purge existing UniFi OS server before install? Default: False.
+unifi_cfg_os_purge_enable: false
+
+# Purge installation binary after install?
+unifi_cfg_os_installer_purge_enable: true
+
+# Number of times to retry failed downloads? Default: 3.
+unifi_cfg_os_download_retries: 3
+
+# User access to 'uosserver' CLI.
+#
+# uosserver command access. Useful for container shell and generating support
+# files.
+#
+# unifi_cfg_os_uosserver_users:
+#     list of dict - User entitlements.
+#   - name: str - Username.
+#     state: str - Add or remove access.
+#         Values:
+#           present: Add user to uosserver group.
+#           absent: Remove user from uosserver group.
+#         Default: 'present'.
+#
+# unifi_cfg_os_uosserver_users:
+#   - user: 'test'
+#     state: 'present'
+#   - user: 'test2'
+#   - user: 'old_user'
+#     state: 'absent'
+#
+# Default: [] (disabled).
+unifi_cfg_os_uosserver_users: []

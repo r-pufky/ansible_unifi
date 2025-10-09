@@ -1,0 +1,39 @@
+---
+###############################################################################
+# Prep
+###############################################################################
+# Prepare system for install by creating user/group for service.
+
+- name: 'Legacy | prep | manage users'
+  when: _unifi_cfg_legacy_create_user.raw
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.users'
+    tasks_from: 'role_account_add.yml'
+  vars:
+    users_role_user: '{{ unifi_role_legacy_user }}'
+    users_role_group: '{{ unifi_role_legacy_group }}'
+
+- name: 'Legacy | prep | enumerate user {{ _unifi_cfg_legacy_user.raw }}'
+  ansible.builtin.user:
+    name: '{{ _unifi_cfg_legacy_user.raw }}'
+  check_mode: true
+  changed_when: false
+  register: _unifi_cfg_legacy_user_query
+
+- name: 'Legacy | prep | parse system user UID/GID'
+  ansible.builtin.set_fact:
+    _unifi_cfg_legacy_user: '{{
+        _unifi_cfg_legacy_user |
+        combine({"_uid": _unifi_cfg_legacy_user_query.uid})
+      }}'
+    _unifi_cfg_legacy_group: '{{
+        _unifi_cfg_legacy_group |
+        combine({"_gid": _unifi_cfg_legacy_user_query.group})
+      }}'
+
+- name: 'Legacy | prep | set debconf has_backup'
+  ansible.builtin.debconf:
+    name: 'unifi'
+    question: '{{ _unifi_cfg_legacy_backup_prompt_disable._question }}'
+    vtype: 'boolean'
+    value: '{{ _unifi_cfg_legacy_backup_prompt_disable._value }}'

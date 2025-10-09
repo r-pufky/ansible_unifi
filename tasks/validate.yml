@@ -1,0 +1,35 @@
+---
+###############################################################################
+# Validate
+###############################################################################
+# Ensure Firefly services and confirm they are active and running.
+
+- name: 'Validate | start services'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    enabled: true
+    daemon_reload: true
+    state: 'started'
+  loop: '{{
+      ["unifi.service" if _unifi_srv_legacy_enable.raw else "",
+       "uosserver.service" if _unifi_srv_os_enable.raw else ""] | select()
+    }}'
+
+- name: 'Validate | query service status'
+  ansible.builtin.service_facts:
+
+- name: 'Validate | assert services running'
+  ansible.builtin.assert:
+    quiet: true
+    that: ansible_facts.services[item].state == 'running'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                     Service failed to start.                      │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ {{ item }}
+  loop: '{{
+      ["unifi.service" if _unifi_srv_legacy_enable.raw else "",
+       "uosserver.service" if _unifi_srv_os_enable.raw else ""] | select()
+    }}'

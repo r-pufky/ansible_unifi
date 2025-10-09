@@ -1,0 +1,61 @@
+---
+###############################################################################
+# Assert Settings
+###############################################################################
+# Sanity check options to stop preventable errors and accidental data deletion.
+
+- name: 'Assert | mutually exclusive os and network server'
+  when: unifi_srv_legacy_enable
+  ansible.builtin.assert:
+    quiet: true
+    that: 'not unifi_srv_os_enable'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │            Mutually exclusive: OS and Network Server.             │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Install Network Server or OS. Not both.
+      │
+      │ unifi_srv_legacy_enable: {{ unifi_srv_legacy_enable }}
+      │ unifi_srv_os_enable: {{ unifi_srv_os_enable }}
+
+- name: 'Assert | CPU AVX support'
+  when: unifi_cfg_legacy_mongodb_enable
+  ansible.builtin.assert:
+    quiet: true
+    that: '"avx" in ansible_facts.flags'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                   AVX CPU extensions required.                    │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ MongoDB 5.0+ requires AVX extensions.
+      │
+      │ Non-AVX MongoDB support requires building MongoDB with patches or
+      │ using 4.4; both of which are not supported by this role.
+      │
+      │ Reference:
+      │ * https://github.com/openimsdk/open-im-server/issues/1533
+      │ * https://github.com/AmazedMender16/mongodb-no-avx-patch
+      │
+      │ unifi_cfg_legacy_mongodb_enable: {{ unifi_cfg_legacy_mongodb_enable }}
+
+# yamllint disable rule:line-length
+- name: 'Assert | default debug setting preference'
+  ansible.builtin.assert:
+    quiet: true
+    that: 'unifi_cfg_legacy_properties_debug_setting_preference == "auto"'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │          Requirements not met: debug setting preference.          │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Option is undocumented and cannot be changed. Please submit a bug
+      │ with supporting documentation on use to be enabled in role.
+      │
+      │ https://github.com/r-pufky/ansible_unifi/issues/new
+      │
+      │ unifi_cfg_legacy_properties_debug_setting_preference: {{ unifi_cfg_legacy_properties_debug_setting_preference }}

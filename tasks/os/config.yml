@@ -1,0 +1,150 @@
+---
+###############################################################################
+# Configure UniFi OS
+###############################################################################
+# Binary OS install requirements:
+# * uosserver user/group do not exist.
+# * podman is installed.
+# * ~15GB space.
+#
+# Exit Codes:
+#     0: Success.
+#   141: Success - some steps failed do already complete / missing.
+#
+# Reference:
+# * https://help.ui.com/hc/en-us/articles/34210126298775-Self-Hosting-UniFi
+
+- name: 'OS | config | detected version'
+  ansible.builtin.debug:
+    msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                          Parsed version.                          │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Version: {{ _unifi_cfg_os_version._version }}
+      │ Binary: {{ _unifi_cfg_os_version._binary }}
+
+- name: 'OS | config | remove existing install'
+  when: _unifi_cfg_os_purge_enable.raw
+  ansible.builtin.shell:
+    '{{ "set -o pipefail && yes | " ~ _unifi_srv_os_enable._purge }}'
+  args:
+    executable: '/bin/bash'
+    removes: '{{ _unifi_srv_os_enable._config }}'
+  register: _unifi_os_rc
+  failed_when: _unifi_os_rc.rc not in [0, 141]
+
+- name: 'OS | config | check required user'
+  ansible.builtin.user:
+    name: 'uosserver'
+  check_mode: true
+  register: _unifi_os_user
+
+- name: 'OS | config | user uosserver exists ⚠'
+  when: not _unifi_os_user.changed
+  ansible.builtin.fail:
+    msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                      User exists: uosserver.                      │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ OS installer will refuse to start with existing user. There is an
+      │ an existing, or partial, install.
+      │
+      │ Try unifi_cfg_os_purge_enable=true.
+
+- name: 'OS | config | check install binary'
+  ansible.builtin.stat:
+    path: '{{ _unifi_cfg_os_version._installer }}'
+  register: _unifi_os_install
+
+- name: 'OS | config | download'
+  when: not _unifi_os_install.stat.exists
+  block:
+    - name: 'OS | config | download in progress 🗘'
+      ansible.builtin.debug:
+        msg: |
+          ╭───────────────────────────────────────────────────────────────────╮
+          │                                                                   │
+          │     Assets are being downloaded. This may take a few minutes.     │
+          │                                                                   │
+          ╰───────────────────────────────────────────────────────────────────╯
+
+    - name: 'OS | config | {{ _unifi_cfg_os_version._version }}'
+      ansible.builtin.get_url:
+        url: '{{ _unifi_cfg_os_version._url }}'
+        dest: '{{ _unifi_cfg_os_version._installer }}'
+        owner: '{{ _unifi_cfg_legacy_user._uid }}'
+        group: '{{ _unifi_cfg_legacy_group._gid }}'
+        mode: '0640'  # Cannot set executable directly.
+      register: _unifi_download
+      until: _unifi_download is succeeded
+      retries: '{{ unifi_cfg_os_download_retries }}'
+      delay: 2
+
+- name: 'OS | config | set installer permissions'
+  ansible.builtin.file:
+    path: '{{ _unifi_cfg_os_version._installer }}'
+    mode: '0750'
+
+- name: 'OS | config | install in progress 🗘'
+  ansible.builtin.debug:
+    msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │        Running OS installer. This may take a few minutes.         │
+      │                                                                   │
+      ╰───────────────────────────────────────────────────────────────────╯
+
+- name: 'OS | config | install'
+  ansible.builtin.shell: '{{
+      "set -o pipefail && yes | " ~ _unifi_cfg_os_version._installer
+    }}'
+  args:
+    executable: '/bin/bash'
+    creates: '/var/lib/uosserver'
+  register: _unifi_os_rc
+  failed_when: _unifi_os_rc.rc not in [0, 141]
+
+- name: 'OS | config | remove installer'
+  when: _unifi_cfg_os_installer_purge_enable.raw
+  ansible.builtin.file:
+    path: '{{ _unifi_cfg_os_version._installer }}'
+    state: 'absent'
+
+- name: 'OS | config | set user uosserver access'
+  when: _unifi_cfg_os_uosserver_users.raw | length > 0
+  ansible.builtin.user:
+    name: '{{ item.user }}'
+    groups: 'uosserver'
+    append: true
+    state: '{{ item.state }}'
+  loop: '{{ _unifi_cfg_os_uosserver_users.data }}'
+  loop_control:
+    label: '{{ item.user }}'
+
+- name: 'OS | config | query install'
+  ansible.builtin.slurp:
+    src: '{{ _unifi_srv_os_enable._config }}'
+  register: _unifi_properties
+
+- name: 'OS | config | parse auto-generated settings'
+  ansible.builtin.set_fact:
+    _unifi_os_uuid: '{{
+        _unifi_properties.content | b64decode | split |
+        select("match", "^UOS_UUID") | first | split("=") | last
+      }}'
+
+- name: 'OS | config | UniFi OS UUID'
+  ansible.builtin.debug:
+    msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                           UniFi OS UUID                           │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ UUID: {{ _unifi_os_uuid }}
+      │
+      │ Default WebUI port: 11443

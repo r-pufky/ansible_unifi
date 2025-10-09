@@ -1,0 +1,19 @@
+---
+- name: 'Converge'
+  hosts: 'all'
+  gather_facts: true  # /proc AVX detection.
+  become: true
+  tasks:
+    - name: 'Converge | simulate user media restriction'
+      ansible.builtin.file:
+        path: '{{ item }}'
+        owner: 400
+        group: 400
+        mode: '0755'
+        state: 'directory'
+      loop:
+        - '/data/unifi'
+
+    - name: 'Converge | apply r_pufky.srv.unifi'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.unifi'

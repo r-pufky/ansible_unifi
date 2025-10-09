@@ -1,0 +1,18 @@
+---
+- name: 'Verify'
+  hosts: 'all'
+  gather_facts: false
+  become: true
+  tasks:
+    - name: 'Verify | /var/lib/uosserver/server.conf'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Verify | /var/lib/uosserver/server.conf'
+        test_file: '/var/lib/uosserver/server.conf'
+        test_owner: 'uosserver'
+        test_group: 'uosserver'
+        test_mode: '0755'
+        test_state: 'file'
+        test_diff: true

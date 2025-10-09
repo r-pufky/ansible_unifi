@@ -1,22 +1,324 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
 # Ports Configuration
 ###############################################################################
-# Ports should be managed externally via an OS role.
+# Manage firewall with r_pufky.deb.ufw. Selectively enable ports based on
+# service configuration.
 #
 # Reference:
-# * https://help.ui.com/hc/en-us/articles/218506997-UniFi-Ports-Used
-# * https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html
+# * https://help.ui.com/hc/en-us/articles/218506997-Required-Ports-Reference
+# * https://community.ui.com/releases/UniFi-OS-Server-4-3-6/6203a43a-d19b-43ee-9cf9-835522f19eae
+# * https://forum.opnsense.org/index.php?action=profile;area=showposts;u=50658
+# * https://github.com/r-pufky/ansible_ufw
+# yamllint disable rule:line-length
 
-ports:
-  - {proto: 'udp', from_ip: 'any', to_port: 3478,        direction: 'in', comment: 'STUN'}
-  - {proto: 'udp', from_ip: 'any', to_port: 5514,        direction: 'in', comment: 'remote syslog capture'}
-  - {proto: 'udp', from_ip: 'any', to_port: '5656:5699', direction: 'in', comment: 'AP-EDU broadcasting'}
-  - {proto: 'udp', from_ip: 'any', to_port: 10001,       direction: 'in', comment: 'device discovery'}
-  - {proto: 'udp', from_ip: 'any', to_port: 1900,        direction: 'in', comment: 'L2 network discovery'}
-  - {proto: 'tcp', from_ip: 'any', to_port: 8080,        direction: 'in', comment: 'device/application communication'}
-  - {proto: 'tcp', from_ip: 'any', to_port: 8443,        direction: 'in', comment: 'WebUI'}
-  - {proto: 'tcp', from_ip: 'any', to_port: 8880,        direction: 'in', comment: 'HTTP portal redirection'}
-  - {proto: 'tcp', from_ip: 'any', to_port: 8843,        direction: 'in', comment: 'HTTPS portal redirection'}
-  - {proto: 'tcp', from_ip: 'any', to_port: 6789,        direction: 'in', comment: 'unifi mobile speed test'}
-  - {proto: 'tcp', from_ip: '127.0.0.1', to_ip: '127.0.0.1', to_port: 27117, direction: 'in', comment: 'database communication (localhost only)'}
+unifi_srv_ports:
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 53
+    direction: 'in'
+    comment: >
+      'UniFi Network - DNS '
+      '(Guest Portal redirection, remote access, updates, remote management)'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 53
+    direction: 'out'
+    comment: >
+      'UniFi Network - DNS '
+      '(Guest Portal redirection, remote access, updates, remote management)'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: 53
+    direction: 'in'
+    comment: >
+      'UniFi Network - DNS '
+      '(Guest Portal redirection, remote access, updates, remote management)'
+  - proto: 'udp'
+    to_ip: 'any'
+    from_port: 53
+    direction: 'out'
+    comment: >
+      'UniFi Network - DNS '
+      '(Guest Portal redirection, remote access, updates, remote management)'
+  - proto: 'udp'
+    to_ip: 'any'
+    to_port: 123
+    direction: 'out'
+    comment: >
+      'UniFi Network - NTP (time sync) '
+      'Required for establishing secure connections'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 443  # Unifi OS uses 11443 (below).
+    direction: 'in'
+    comment: >
+      'UniFi Network - '
+      'Application GUI/API access via web browser, remote access service'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 443  # Unifi OS uses 11443 (below).
+    direction: 'out'
+    comment: >
+      'UniFi Network - '
+      'Application GUI/API access via web browser, remote access service'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: 1900
+    direction: 'in'
+    comment: >
+      'UniFi Network - '
+      'L2 discovery (Make application discoverable on L2 network)'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: 3478
+    direction: 'in'
+    comment: >
+      'UniFi Network - '
+      'STUN for device adoption, communication, and remote access'
+  - proto: 'udp'
+    to_ip: 'any'
+    from_port: 3478
+    direction: 'out'
+    comment: >
+      'UniFi Network - '
+      'STUN for device adoption, communication, and remote access'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 5439
+    direction: 'in'
+    comment: 'UniFi Network - Remote Access support'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: 5514
+    direction: 'in'
+    comment: 'UniFi Network - Remote syslog capture'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 6789
+    direction: 'in'
+    comment: 'UniFi Network - Mobile speed test'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 8080
+    direction: 'in'
+    comment: 'UniFi Network - Device and application communication (inform)'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 8443
+    direction: 'in'
+    comment: 'UniFi Network - Application GUI/API (on UniFi Console)'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 8444
+    direction: 'in'
+    comment: 'UniFi Network - Secure Portal for Hotspot'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 8843
+    direction: 'in'
+    comment: 'UniFi Network - Hotspot portal redirection (HTTPS)'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: '8880:8882'
+    direction: 'in'
+    comment: 'UniFi Network - Hotspot portal redirection (HTTP)'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 8883
+    direction: 'out'
+    comment: 'UniFi Network - Remote Access service'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: 10001
+    direction: 'in'
+    comment: 'UniFi Network - Device discovery during adoption'
+  - proto: 'tcp'
+    from_ip: '127.0.0.1'
+    to_ip: '127.0.0.1'
+    to_port: 27117
+    direction: 'in'
+    comment: 'UniFi Network - Local database communication (MongoDB)'
+
+# Unifi OS Server ports.
+unifi_srv_os_ports:
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 5005
+    direction: 'in'
+    comment: 'UniFi OS - Controller Discovery'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 5005
+    direction: 'out'
+    comment: 'UniFi OS - Controller Discovery'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 9543
+    direction: 'in'
+    comment: 'UniFi OS - API'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 9543
+    direction: 'out'
+    comment: 'UniFi OS - API'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 10003
+    direction: 'in'
+    comment: 'UniFi OS - AP/Device Monitoring'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 10003
+    direction: 'out'
+    comment: 'UniFi OS - AP/Device Monitoring'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 11084
+    direction: 'in'
+    comment: 'UniFi OS - Undocumented'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 11084
+    direction: 'out'
+    comment: 'UniFi OS - Undocumented'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 11443
+    direction: 'in'
+    comment: 'UniFi OS - OS server WebUI'
+
+# UniFi Protect ports. Only required if using UniFi protect.
+unifi_srv_protect_ports:
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7441
+    direction: 'in'
+    comment: 'UniFi Protect - Outgoing RTSPS streams'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7442
+    direction: 'in'
+    comment: 'UniFi Protect - WebSocket server for device communication'
+  - proto: 'tcp'
+    to_ip: 'any'
+    to_port: 7442
+    direction: 'out'
+    comment: 'UniFi Protect - WebSocket server for device communication'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7443
+    direction: 'in'
+    comment: 'UniFi Protect - REST API (HTTPS)'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7443
+    direction: 'out'
+    comment: 'UniFi Protect - REST API (HTTPS)'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7444
+    direction: 'in'
+    comment: 'UniFi Protect - WebSocket server for camera communication'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7444
+    direction: 'out'
+    comment: 'UniFi Protect - WebSocket server for camera communication'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7445
+    direction: 'in'
+    comment: 'UniFi Protect - Outgoing Protect streams'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7447
+    direction: 'in'
+    comment: 'UniFi Protect - Outgoing RTSP streams'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7550
+    direction: 'in'
+    comment: 'UniFi Protect - Camera streams'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7552
+    direction: 'in'
+    comment: 'UniFi Protect - SSL camera connections'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7552
+    direction: 'out'
+    comment: 'UniFi Protect - SSL camera connections'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7888
+    direction: 'in'
+    comment: 'UniFi Protect - TCP Bridge'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7888
+    direction: 'out'
+    comment: 'UniFi Protect - TCP Bridge'
+
+# Stacked NVRs (MSR/MSP). Only required if using physically stacked NVRs.
+unifi_srv_stacked_nvrs_ports:
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7446
+    direction: 'in'
+    comment: 'UniFi Protect - Protect streams between consoles'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7446
+    direction: 'out'
+    comment: 'UniFi Protect - Protect streams between consoles'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7451
+    direction: 'in'
+    comment: 'UniFi Protect - Protect streams between consoles'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7451
+    direction: 'out'
+    comment: 'UniFi Protect - Protect streams between consoles'
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 7600
+    direction: 'in'
+    comment: 'UniFi Protect - Protect application communications'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 7600
+    direction: 'out'
+    comment: 'UniFi Protect - Protect application communications'
+
+# Legacy device ports. Use only if required.
+unifi_srv_legacy_ports:
+  - proto: 'tcp'
+    from_ip: 'any'
+    to_port: 22
+    direction: 'in'
+    comment: 'UniFi Legacy - SSH (manual management not used by default)'
+  - proto: 'tcp'
+    to_ip: 'any'
+    from_port: 22
+    direction: 'out'
+    comment: 'UniFi Legacy - SSH (manual management not used by default)'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: 22
+    direction: 'in'
+    comment: 'UniFi Legacy - SSH (manual management not used by default)'
+  - proto: 'udp'
+    to_ip: 'any'
+    from_port: 22
+    direction: 'out'
+    comment: 'UniFi Legacy - SSH (manual management not used by default)'
+  - proto: 'udp'
+    from_ip: 'any'
+    to_port: '5656:5699'
+    direction: 'in'
+    comment: 'UniFi Legacy - AP-EDU broadcasting'

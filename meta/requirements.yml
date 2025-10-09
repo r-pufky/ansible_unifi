@@ -1,7 +1,0 @@
----
-collections:
-  # https://docs.ansible.com/ansible/latest/collections/community/general/
-  # archive
-  - community.general
-
-roles: []

@@ -1,0 +1,24 @@
+---
+- name: 'Verify'
+  hosts: 'all'
+  gather_facts: false
+  become: true
+  tasks:
+    - name: 'Verify | /var/lib/unifi/system.properties'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'lineinfile.yml'
+      vars:
+        test_name: 'Verify | /var/lib/unifi/system.properties'
+        test_file: '/var/lib/unifi/system.properties'
+        test_line: '{{ item }}'
+        test_state: 'present'
+        test_diff: true
+      loop:
+        - 'debug.device=warn'
+        - 'debug.mgmt=warn'
+        - 'debug.sdn=warn'
+        - 'debug.setting_preference=auto'
+        - 'debug.system=warn'
+        - 'reporter-uuid=bda76061-dbf6-453a-8f41-739aab3c09ca'
+        - 'uuid=4678d430-b557-415c-9e74-b5131b8d359e'

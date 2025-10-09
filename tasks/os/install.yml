@@ -1,0 +1,12 @@
+---
+###############################################################################
+# Install Packages
+###############################################################################
+
+- name: 'OS | install | os packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.apt'
+  vars:
+    apt_packages:
+      - '{{ unifi_role_os_packages }}'
+    apt_package_update_cache: true

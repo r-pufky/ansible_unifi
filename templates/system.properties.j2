@@ -1,0 +1,20 @@
+{# Flat configuration file, no labels, with default options removed. #}
+{% for header in _unifi_order %}
+{%   for section in _unifi_map | selectattr('value.section', '==', header) | sort(attribute='value.order') %}
+{%     if not section.value.deprecated %}
+{%       if section.value.keep %}
+{%         if section.value.key in ['reporter-uuid', 'uuid'] %}
+{{ section.value.key }}={{ section.value.raw if section.value.raw | length > 0 else section.value._auto }}
+{%         else %}
+{{ section.value.key }}={{ section.value.raw }}
+{%         endif %}
+{%       elif section.value.raw != section.value.default %}
+{%         if section.value.key in ['unifi.https.ciphers', 'unifi.https.sslEnabledProtocols'] %}
+{{ section.value.key }}={{ section.value.data }}
+{%         else  %}
+{{ section.value.key }}={{ section.value.raw }}
+{%         endif  %}
+{%       endif  %}
+{%     endif %}
+{%   endfor %}
+{% endfor %}

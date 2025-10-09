@@ -1,0 +1,64 @@
+---
+###############################################################################
+# UniFi Legacy
+###############################################################################
+# Previously UniFi Network Server / Controller.
+
+# Enable installation of local MongoDB server?
+#
+# A local MongoDB server will be configured automatically with default options
+# as default configuration assumes it exists. Disable if managing MongoDB
+# externally.
+#
+# Default: True.
+unifi_cfg_legacy_mongodb_enable: true
+
+# Disable backup prompt during installation?
+#
+# UniFi will wait for a manual confirmation that a backup has been completed
+# before installing/upgrading packages via debconf unifi/has_backup. Enabling
+# will prevent the role from executing.
+#
+# Default: True.
+unifi_cfg_legacy_backup_prompt_disable: true
+
+# Only apply configuration?
+#
+# Reduces role application time by ONLY applying configuration changes.
+#
+# This should ONLY be used after the role has been fully run once.
+#
+# Useful when adding a change without reconfiguring the whole system or
+# checking and installing a new version. Suggest applying with extra options:
+#
+#   ansible-playbook site.yml
+#       --tags unifi
+#       -e 'unifi_cfg_legacy_force_config_only_enable=true'
+#
+# Default: False.
+unifi_cfg_legacy_force_config_only_enable: false
+
+###############################################################################
+# UniFi User
+###############################################################################
+
+# User that unifi will run under.
+#
+# Enable unifi_cfg_legacy_create_user if this account not externally managed.
+#
+# Default: 'unifi'.
+unifi_cfg_legacy_user: 'unifi'
+
+# Group that unifi will run under.
+#
+# Enable unifi_cfg_legacy_create_user if this group not externally managed.
+#
+# Default: 'unifi'.
+unifi_cfg_legacy_group: 'unifi'
+
+# Create unifi_cfg_legacy_user, unifi_cfg_legacy_group if not detected?
+#
+# Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
+#
+# Default: True.
+unifi_cfg_legacy_create_user: true

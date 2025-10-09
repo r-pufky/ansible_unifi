@@ -1,35 +1,40 @@
 ---
 ###############################################################################
-# Unifi Controller Role Configuration
+# UniFi Service
 ###############################################################################
-# If unifi controller IP changes, ssh to each device to migrate to new IP:
+
+# Enable installation of UniFi Network Server (legacy)?
 #
-#   set-inform http://{IP}:8080/inform
+# Mutually exclusive with unifi_srv_os_enable.
 #
-# Backup/Restore tasks: automatic upgrade will fail unless a backup is made.
+# Formerly known as UniFi Controller. Highly likely that network server
+# standalone deployments will be deprecated upstream in the future.
 #
-# Reference:
-# * https://community.ui.com/questions/unifi-apt-get-upgrade-prompt-for-backups/f2ac7635-07f4-46fe-aeda-2933af474174
+# Install size: ~1.2GB
+#     Unifi: ~240MB.
+#   OpenJDK: ~203MB.
+#   MongoDB: ~675MB.
+#
+# See legacy/*.yml.
+#
+# Default: True.
+unifi_srv_legacy_enable: false
 
-# User that unifi will run under. Assumes externally managed.
-unifi_user:  'unifi'
-unifi_group: 'unifi'
-
-# User that MongoDB will run under. Assumes externally managed.
-mongo_user:  'mongodb'
-mongo_group: 'mongodb'
-
-# Create 'unifi'/'mongodb' user if not detected? See: vars/main.yml.
-unifi_create_user: false
-
-# Installation directory
-unifi_data: '/var/lib/unifi'
-
-# Staging directory for backups
-unifi_staging: '/var/lib/unifi-staging'
-
-# Target location of backup file on ansible host.
-unifi_local_backup: 'host_vars/data/unifi-config.tar.gz'
-
-# Backup MongoDB on upgrades? (If false autoupgrades will fail).
-unifi_backup: true
+# Enable installation of UniFi OS?
+#
+# Mutually exclusive with unifi_srv_legacy_enable.
+#
+# New installations should use this. Once installed - all management -
+# including updates are done through the service and not the role.
+#
+# Modern UniFi deployment using a container on podman that runs additional
+# UniFi applications including network server (above). UniFi Network Server is
+# bundled with UniFi OS upstream. Podman containers are run as a service;
+# nesting containers may require additional host container privileges.
+#
+# Install size: ~16GB (Control plane, Network Server only)
+#       Unifi OS: ~4GB.
+#   Dependencies: ~12GB.
+#
+# Default: False.
+unifi_srv_os_enable: true

@@ -1,3 +1,16 @@
 ---
-- ansible.builtin.include_tasks: manage_users.yml
-- ansible.builtin.include_tasks: install.yml
+- name: 'Assert'
+  ansible.builtin.import_tasks: 'assert.yml'
+- name: 'Annotate'
+  ansible.builtin.import_tasks: 'annotate.yml'
+
+- name: 'Legacy'
+  when: _unifi_srv_legacy_enable.raw
+  ansible.builtin.include_tasks: 'legacy/main.yml'
+
+- name: 'OS'
+  when: _unifi_srv_os_enable.raw
+  ansible.builtin.import_tasks: 'os/main.yml'
+
+- name: 'Validate'
+  ansible.builtin.import_tasks: 'validate.yml'

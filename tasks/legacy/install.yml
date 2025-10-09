@@ -1,0 +1,22 @@
+---
+###############################################################################
+# Install Packages
+###############################################################################
+# Add external UniFi APT source and required dependencies.
+
+- name: 'Legacy | install | MongoDB'
+  when: _unifi_cfg_legacy_mongodb_enable.raw
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.mongodb'
+  vars:
+    mongodb_srv_version: '{{ unifi_role_legacy_mongodb_version }}'
+    mongodb_srv_fatal_version_enable: false
+
+- name: 'Legacy | install | network server packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.apt'
+  vars:
+    apt_packages:
+      - '{{ unifi_role_legacy_packages }}'
+    apt_sources: '{{ unifi_role_apt_sources }}'
+    apt_package_update_cache: true

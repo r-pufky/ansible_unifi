@@ -1,0 +1,73 @@
+---
+###############################################################################
+# Legacy
+###############################################################################
+# Default legacy install configures UniFi controller. VM required as MongoDB
+# requires AVX CPU enabled.
+#
+# Tests:
+# * service running.
+# * /var/lib/unifi/system.properties set correctly.
+# * /data/unifi/backup/unifi_server_backup script set (with user data perms).
+# * Default options are set correctly.
+
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'vagrant'
+  provider:
+    name: 'virtualbox'
+    config_options:
+      ssh.keep_alive: true
+      ssh.remote_user: 'root'
+    options:
+      append_platform_to_hostname: false
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+  inventory:
+    group_vars:
+      all:
+        unifi_srv_legacy_enable: true
+        unifi_srv_os_enable: false
+        unifi_cfg_legacy_properties_reporter_uuid:
+          'bda76061-dbf6-453a-8f41-739aab3c09ca'
+        unifi_cfg_legacy_properties_uuid:
+          '4678d430-b557-415c-9e74-b5131b8d359e'
+platforms:
+  - name: 'unifi-debian-13-vm-legacy'
+    box: 'inception-of-things/debian-trixie'
+    memory: 4096
+    cpus: 2
+    interfaces:
+      - network_name: private_network  # network_name required.
+        auto_config: true
+        type: 'dhcp'
+    instance_raw_config_args:
+      - 'vm.network "forwarded_port", guest: 8443, host: 8443'
+      - 'vm.network "forwarded_port", guest: 8080, host: 8080'
+      - 'vm.network "forwarded_port", guest: 8880, host: 8880'
+      - 'vm.network "forwarded_port", guest: 8843, host: 8843'
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    # - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # services created one time.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

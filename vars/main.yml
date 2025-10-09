@@ -1,83 +1,95 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
-# Default Unifi Package Dependencies
+# UniFi Role Options
 ###############################################################################
-# Default required packages for Unifi install.
+#
+# Updates:
+# * New MAJOR, MINOR releases should hard branch at Debian version before
+#   starting (e.g. 13.0.x branch).
+# * Validated package version tracked in role variable.
+# * Keep a separate change log as changes are made, you will not remember all
+#   of them.
+# * Update role defaults (includes updating defaults, tasks):
+#   * Legacy: check /var/lib/unifi/system.properties for updated defaults.
+#   * OS: check and update new release links.
+# * Update tests for any changes.
+# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Tag with OS-APP_OS-VERSION-ROLE version.
+#
+# Reference:
+# * https://nginx.org/en/download.html
+# * https://www.neelc.org/posts/unifi-debian/
 
-unifi_default_dependencies:
-  - 'gnupg2'
+# Last time UniFi options were validated against a default configuration.
+unifi_role_validate_date: '2025-10-07'
+unifi_role_validate_release: 'trixie'
+unifi_role_validate_server_version: '9.4.19'
+unifi_role_validate_os_version: '4.3.6'
 
-unifi_default_packages:
-  - 'mongodb-org'
-  - 'openjdk-8-jre-headless'
+###############################################################################
+# APT Packages
+###############################################################################
+
+unifi_role_legacy_packages:
   - 'unifi'
 
-###############################################################################
-# Default Unifi User Group
-###############################################################################
-# Default group settings if an Unifi user is force created.
+unifi_role_os_packages:
+  - 'podman'
 
-unifi_default_unifi_group:
+unifi_role_apt_sources:
+  - name: 'unifi'
+    types:
+      - 'deb'
+    uris: 'https://www.ui.com/downloads/unifi/debian'
+    suites:
+      - 'stable'
+    components:
+      - 'ubiquiti'
+    signed_by: 'https://dl.ui.com/unifi/unifi-repo.gpg'
+
+###############################################################################
+# UniFi Legacy
+###############################################################################
+#
+# Reference:
+# * https://help.ui.com/hc/en-us/articles/360012282453-Self-Hosting-a-UniFi-Network-Server
+# * https://help.ui.com/hc/en-us/articles/205202580-Explaining-the-UniFi-system-properties-File
+
+unifi_role_legacy_mongodb_version: '8.0'
+
+unifi_role_legacy_group:
   name: 'unifi'
-  gid:  400
+  gid: 400
 
-###############################################################################
-# Default Unifi User Account
-###############################################################################
-# Default user settings if an Unifi user is force created.
-#
-# Logins are disabled.
-
-unifi_default_unifi_user:
-  name:            'unifi'
-  group:           'unifi'
-  groups:
-    - 'unifi'
-  uid:             400
-  shell:           '/usr/sbin/nologin'
-  home:            '/var/lib/unifi'
-  create_home:     false
-  password:        '!'
-  password_lock:   true
+unifi_role_legacy_user:
+  name: 'unifi'
+  group: 'unifi'
+  uid: 400
+  shell: '/usr/sbin/nologin'
+  home: '/var/lib/unifi'
+  create_home: false
+  password: '!'
+  password_lock: true
   update_password: 'always'
-  expires:         -1
-  system:          true
+  expires: -1
+  system: true
 
 ###############################################################################
-# Default MongoDB User Group
+# UniFi OS
 ###############################################################################
-# Default group settings if an MongoDB user is force created.
-
-unifi_default_mongo_group:
-  name: 'mongodb'
-  gid:  401
-
-###############################################################################
-# Default MongoDB User Account
-###############################################################################
-# Default user settings if an MongoDB user is force created.
+# UniFi OS requires podman installation; all other options (and upgrades) are
+# set within the app itself.
 #
-# Logins are disabled.
+# Reference:
+# * https://ui.com/download/releases/unifi-os-server/4.3.6
+# * https://help.ui.com/hc/en-us/articles/34210126298775-Self-Hosting-UniFi
 
-unifi_default_mongo_user:
-  name:            'mongodb'
-  group:           'nogroup'
-  groups:
-    - 'nogroup'
-    - 'mongodb'
-  uid:             401
-  shell:           '/usr/sbin/nologin'
-  home:            '/home/mongodb'
-  create_home:     false
-  password:        '!'
-  password_lock:   true
-  update_password: 'always'
-  expires:         -1
-  system:          true
+unifi_role_os_url: 'https://fw-download.ubnt.com/data/unifi-os-server/'
 
-###############################################################################
-# Default Unifi Version
-###############################################################################
-# updated: 2021-12-14
+unifi_role_os_binary:
+  '2f3a-linux-x64-4.3.6-be3b4ae0-6bcd-435d-b893-e93da668b9d0.6-x64'
 
-unifi_default_version: '6.5.55'
+unifi_role_os_version: '{{
+    unifi_role_os_binary | split("linux-x64-") | last | split("-") | first
+ }}'
