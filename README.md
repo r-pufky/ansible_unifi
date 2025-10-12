@@ -47,6 +47,27 @@ Install UniFi Legacy (Network Server / Controller).
     unifi_srv_os_enable: false
 ```
 
+## Troubleshooting
+
+### UniFi OS: unifi.server failed to connect stdout to journal socket
+UniFi OS container is auto configured from host settings on first start.
+
+Set a valid network configuration with default routes.
+
+#### Reinstall UniFi OS container:
+``` bash
+ansible-playbook site.yml --tags unifi -e 'unifi_cfg_os_purge_enable=true'
+```
+
+### Adopted device lost (inform to Network Server failed)
+Network Server IP changed.
+
+#### Update inform address for device:
+``` bash
+ssh {USER}@{DEVICE}
+set-inform http://{SERVER}:8080/inform
+```
+
 ## Development
 Configure [environment](https://github.com/r-pufky/ansible_collection_srv/blob/main/docs/dev/environment/README.md)
 
