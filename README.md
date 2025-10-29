@@ -56,7 +56,7 @@ Set a valid network configuration with default routes.
 
 #### Reinstall UniFi OS container:
 ``` bash
-ansible-playbook site.yml --tags unifi -e 'unifi_cfg_os_purge_enable=true'
+ansible-playbook site.yml --tags unifi -e '{"unifi_cfg_os_purge_enable": true}'
 ```
 
 ### Adopted device lost (inform to Network Server failed)

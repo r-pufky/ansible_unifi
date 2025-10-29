@@ -33,7 +33,7 @@ unifi_cfg_legacy_backup_prompt_disable: true
 #
 #   ansible-playbook site.yml
 #       --tags unifi
-#       -e 'unifi_cfg_legacy_force_config_only_enable=true'
+#       -e '{"unifi_cfg_legacy_force_config_only_enable": true}'
 #
 # Default: False.
 unifi_cfg_legacy_force_config_only_enable: false
