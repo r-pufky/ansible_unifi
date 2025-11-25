@@ -14,7 +14,7 @@
 #   * Legacy: check /var/lib/unifi/system.properties for updated defaults.
 #   * OS: check and update new release links.
 # * Update tests for any changes.
-# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
 # * Tag with OS-APP_OS-VERSION-ROLE version.
 #
 # Reference:
