@@ -53,15 +53,9 @@ lint: |
   ansible-lint .
 scenario:
   test_sequence:
-    # - 'dependency'
-    # - 'cleanup'
     - 'destroy'
     - 'syntax'
     - 'create'
-    # - 'prepare'
     - 'converge'
-    # - 'idempotence'  # services created one time.
-    # - 'side_effect'
     - 'verify'
-    # - 'cleanup'
     - 'destroy'

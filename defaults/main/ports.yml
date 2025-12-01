@@ -19,74 +19,74 @@ unifi_srv_ports:
     to_port: 53
     direction: 'in'
     comment: >
-      'UniFi Network - DNS '
-      '(Guest Portal redirection, remote access, updates, remote management)'
+      UniFi Network - DNS
+      (Guest Portal redirection, remote access, updates, remote management)
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 53
+    to_port: 53
     direction: 'out'
     comment: >
-      'UniFi Network - DNS '
-      '(Guest Portal redirection, remote access, updates, remote management)'
+      UniFi Network - DNS
+      (Guest Portal redirection, remote access, updates, remote management)
   - proto: 'udp'
     from_ip: 'any'
     to_port: 53
     direction: 'in'
     comment: >
-      'UniFi Network - DNS '
-      '(Guest Portal redirection, remote access, updates, remote management)'
+      UniFi Network - DNS
+      (Guest Portal redirection, remote access, updates, remote management)
   - proto: 'udp'
     to_ip: 'any'
-    from_port: 53
+    to_port: 53
     direction: 'out'
     comment: >
-      'UniFi Network - DNS '
-      '(Guest Portal redirection, remote access, updates, remote management)'
+      UniFi Network - DNS
+      (Guest Portal redirection, remote access, updates, remote management)
   - proto: 'udp'
     to_ip: 'any'
     to_port: 123
     direction: 'out'
     comment: >
-      'UniFi Network - NTP (time sync) '
-      'Required for establishing secure connections'
+      UniFi Network - NTP (time sync)
+      Required for establishing secure connections
   - proto: 'tcp'
     from_ip: 'any'
     to_port: 443  # Unifi OS uses 11443 (below).
     direction: 'in'
     comment: >
-      'UniFi Network - '
-      'Application GUI/API access via web browser, remote access service'
+      UniFi Network -
+      Application GUI/API access via web browser, remote access service
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 443  # Unifi OS uses 11443 (below).
+    to_port: 443  # Unifi OS uses 11443 (below).
     direction: 'out'
     comment: >
-      'UniFi Network - '
-      'Application GUI/API access via web browser, remote access service'
+      UniFi Network -
+      Application GUI/API access via web browser, remote access service
   - proto: 'udp'
     from_ip: 'any'
     to_port: 1900
     direction: 'in'
     comment: >
-      'UniFi Network - '
-      'L2 discovery (Make application discoverable on L2 network)'
+      UniFi Network -
+      L2 discovery (Make application discoverable on L2 network)
   - proto: 'udp'
     from_ip: 'any'
     to_port: 3478
     direction: 'in'
     comment: >
-      'UniFi Network - '
-      'STUN for device adoption, communication, and remote access'
+      UniFi Network -
+      STUN for device adoption, communication, and remote access
   - proto: 'udp'
     to_ip: 'any'
-    from_port: 3478
+    to_port: 3478
     direction: 'out'
     comment: >
-      'UniFi Network - '
-      'STUN for device adoption, communication, and remote access'
+      UniFi Network -
+      STUN for device adoption, communication, and remote access
   - proto: 'tcp'
     from_ip: 'any'
-    to_port: 5439
+    to_port: 5349
     direction: 'in'
     comment: 'UniFi Network - Remote Access support'
   - proto: 'udp'
@@ -126,7 +126,7 @@ unifi_srv_ports:
     comment: 'UniFi Network - Hotspot portal redirection (HTTP)'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 8883
+    to_port: 8883
     direction: 'out'
     comment: 'UniFi Network - Remote Access service'
   - proto: 'udp'
@@ -137,9 +137,21 @@ unifi_srv_ports:
   - proto: 'tcp'
     from_ip: '127.0.0.1'
     to_ip: '127.0.0.1'
-    to_port: 27117
+    to_port: 27117  # Not used in UniFi OS.
     direction: 'in'
     comment: 'UniFi Network - Local database communication (MongoDB)'
+  - proto: 'udp'
+    to_port: '5000:50000'
+    direction: 'in'
+    comment: >
+      UniFi Network -
+      Remote Access service (STUN unifi.ui.com via cloudflare)
+  - proto: 'udp'
+    to_port: '5000:50000'
+    direction: 'out'
+    comment: >
+      UniFi Network -
+      Remote Access service (STUN unifi.ui.com via cloudflare)
 
 # Unifi OS Server ports.
 unifi_srv_os_ports:
@@ -150,7 +162,7 @@ unifi_srv_os_ports:
     comment: 'UniFi OS - Controller Discovery'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 5005
+    to_port: 5005
     direction: 'out'
     comment: 'UniFi OS - Controller Discovery'
   - proto: 'tcp'
@@ -160,7 +172,7 @@ unifi_srv_os_ports:
     comment: 'UniFi OS - API'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 9543
+    to_port: 9543
     direction: 'out'
     comment: 'UniFi OS - API'
   - proto: 'tcp'
@@ -170,7 +182,7 @@ unifi_srv_os_ports:
     comment: 'UniFi OS - AP/Device Monitoring'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 10003
+    to_port: 10003
     direction: 'out'
     comment: 'UniFi OS - AP/Device Monitoring'
   - proto: 'tcp'
@@ -180,7 +192,7 @@ unifi_srv_os_ports:
     comment: 'UniFi OS - Undocumented'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 11084
+    to_port: 11084
     direction: 'out'
     comment: 'UniFi OS - Undocumented'
   - proto: 'tcp'
@@ -213,7 +225,7 @@ unifi_srv_protect_ports:
     comment: 'UniFi Protect - REST API (HTTPS)'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7443
+    to_port: 7443
     direction: 'out'
     comment: 'UniFi Protect - REST API (HTTPS)'
   - proto: 'tcp'
@@ -223,7 +235,7 @@ unifi_srv_protect_ports:
     comment: 'UniFi Protect - WebSocket server for camera communication'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7444
+    to_port: 7444
     direction: 'out'
     comment: 'UniFi Protect - WebSocket server for camera communication'
   - proto: 'tcp'
@@ -248,7 +260,7 @@ unifi_srv_protect_ports:
     comment: 'UniFi Protect - SSL camera connections'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7552
+    to_port: 7552
     direction: 'out'
     comment: 'UniFi Protect - SSL camera connections'
   - proto: 'tcp'
@@ -258,7 +270,7 @@ unifi_srv_protect_ports:
     comment: 'UniFi Protect - TCP Bridge'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7888
+    to_port: 7888
     direction: 'out'
     comment: 'UniFi Protect - TCP Bridge'
 
@@ -271,7 +283,7 @@ unifi_srv_stacked_nvrs_ports:
     comment: 'UniFi Protect - Protect streams between consoles'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7446
+    to_port: 7446
     direction: 'out'
     comment: 'UniFi Protect - Protect streams between consoles'
   - proto: 'tcp'
@@ -281,7 +293,7 @@ unifi_srv_stacked_nvrs_ports:
     comment: 'UniFi Protect - Protect streams between consoles'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7451
+    to_port: 7451
     direction: 'out'
     comment: 'UniFi Protect - Protect streams between consoles'
   - proto: 'tcp'
@@ -291,7 +303,7 @@ unifi_srv_stacked_nvrs_ports:
     comment: 'UniFi Protect - Protect application communications'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 7600
+    to_port: 7600
     direction: 'out'
     comment: 'UniFi Protect - Protect application communications'
 
@@ -304,7 +316,7 @@ unifi_srv_legacy_ports:
     comment: 'UniFi Legacy - SSH (manual management not used by default)'
   - proto: 'tcp'
     to_ip: 'any'
-    from_port: 22
+    to_port: 22
     direction: 'out'
     comment: 'UniFi Legacy - SSH (manual management not used by default)'
   - proto: 'udp'
@@ -314,7 +326,7 @@ unifi_srv_legacy_ports:
     comment: 'UniFi Legacy - SSH (manual management not used by default)'
   - proto: 'udp'
     to_ip: 'any'
-    from_port: 22
+    to_port: 22
     direction: 'out'
     comment: 'UniFi Legacy - SSH (manual management not used by default)'
   - proto: 'udp'

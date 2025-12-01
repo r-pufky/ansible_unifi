@@ -18,13 +18,14 @@
 # * Tag with OS-APP_OS-VERSION-ROLE version.
 #
 # Reference:
+# * https://community.ui.com/releases
 # * https://nginx.org/en/download.html
 # * https://www.neelc.org/posts/unifi-debian/
 
 # Last time UniFi options were validated against a default configuration.
 unifi_role_validate_date: '2025-10-07'
 unifi_role_validate_release: 'trixie'
-unifi_role_validate_server_version: '9.4.19'
+unifi_role_validate_server_version: '10.0.160'
 unifi_role_validate_os_version: '4.3.6'
 
 ###############################################################################
