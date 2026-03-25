@@ -18,7 +18,7 @@ All ports and protocols have been defined for the role.
 
 ## Example Playbook
 Read defaults documentation. Highly recommend installing UniFi OS.
-[Additional documentation](http://r-pufky.github.io/r-pufky/docs/networking).
+[Additional documentation](http://r-pufky.github.io/docs/networking).
 
 Install UniFi OS and add specific users to CLI `uosserver` command.
 
